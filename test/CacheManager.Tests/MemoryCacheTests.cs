@@ -185,7 +185,7 @@ namespace CacheManager.Tests
         }
 
         // disabling for netstandard 2 as it doesn't seem to read the "default" configuration from app.config. Might be an xunit/runner issue as the configuration stuff has been ported
-#if !NETCOREAPP2
+#if !NETCOREAPP
 
         [Fact]
         [Trait("category", "NotOnMono")]

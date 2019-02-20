@@ -25,7 +25,7 @@ namespace CacheManager.Tests
     {
         #region binary serializer
 
-#if !NETCOREAPP2
+#if !NETCOREAPP
 
         [Fact]
         public void BinarySerializer_RespectBinarySerializerSettings()

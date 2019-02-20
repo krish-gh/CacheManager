@@ -374,7 +374,7 @@ namespace CacheManager.Tests
             config.CacheHandleConfigurations[0].Key.Should().Be("name");    // now key gets set to name
         }
 
-#if !NETCOREAPP2
+#if !NETCOREAPP
 
         [Fact]
         public void Configuration_CacheHandle_KnownType_CouchbaseNoKey()
@@ -946,7 +946,7 @@ namespace CacheManager.Tests
             act.Should().Throw<InvalidOperationException>().WithMessage("*ICacheSerializer*");
         }
 
-#if !NETCOREAPP2
+#if !NETCOREAPP
 
         [Fact]
         public void Configuration_Serializer_KnownType_Binary()

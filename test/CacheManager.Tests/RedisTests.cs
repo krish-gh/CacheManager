@@ -29,7 +29,7 @@ namespace CacheManager.Tests
             OnClearRegion
         }
 
-#if NETCOREAPP2
+#if NETCOREAPP
         [Fact]
         public void Redis_WithoutSerializer_ShouldThrow()
         {

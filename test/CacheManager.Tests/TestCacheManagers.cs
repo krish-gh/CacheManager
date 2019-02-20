@@ -31,7 +31,7 @@ namespace CacheManager.Tests
             yield return new object[] { TestManagers.WithManyDictionaryHandles };
             yield return new object[] { TestManagers.WithOneDicCacheHandle };
 #if REDISENABLED
-#if !NETCOREAPP2
+#if !NETCOREAPP
             yield return new object[] { TestManagers.WithRedisCacheBinary };
 #endif
             yield return new object[] { TestManagers.WithRedisCacheDataContract };
@@ -49,7 +49,7 @@ namespace CacheManager.Tests
             yield return new object[] { TestManagers.WithDicAndRedisCacheNoLua };
 #endif
 #if MEMCACHEDENABLED
-#if !NETCOREAPP2
+#if !NETCOREAPP
             yield return new object[] { TestManagers.WithMemcachedBinary };
 #endif
             yield return new object[] { TestManagers.WithMemcachedJson };

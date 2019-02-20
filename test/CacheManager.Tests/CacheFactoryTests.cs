@@ -714,7 +714,7 @@ namespace CacheManager.Tests
                     .WithSystemRuntimeCacheHandle());
         }
 
-#if !NETCOREAPP2
+#if !NETCOREAPP 
 
         [Fact]
         [ReplaceCulture]
