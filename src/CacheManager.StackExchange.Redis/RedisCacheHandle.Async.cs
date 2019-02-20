@@ -110,7 +110,7 @@ namespace CacheManager.Redis
         /// <returns>The <c>CacheItem</c>.</returns>
         protected override async ValueTask<CacheItem<TCacheValue>> GetCacheItemInternalAsync(string key, string region)
         {
-            return (await GetCacheItemAndVersionAsync(key, region)).Item1;
+            return (await GetCacheItemAndVersionAsync(key, region))?.Item1;
         }
 
         private async ValueTask<Tuple<CacheItem<TCacheValue>, int>> GetCacheItemAndVersionAsync(string key, string region)
