@@ -26,9 +26,9 @@ namespace CacheManager.Redis
                     {
                         if (server.IsConnected)
                         {
-                            await server.FlushDatabaseAsync(_redisConfiguration.Database).ConfigureAwait(false);
+                            await server.FlushDatabaseAsync(_redisConfiguration.Database);
                         }
-                    }).ConfigureAwait(false);
+                    });
                 }
             }
             catch (NotSupportedException ex)
@@ -46,7 +46,7 @@ namespace CacheManager.Redis
             return RetryAsync(async () =>
             {
                 // we are storing all keys stored in the region in the hash for key=region
-                var hashKeys = await _connection.Database.HashKeysAsync(region).ConfigureAwait(false);
+                var hashKeys = await _connection.Database.HashKeysAsync(region);
 
                 if (hashKeys.Length > 0)
                 {
@@ -54,12 +54,12 @@ namespace CacheManager.Redis
                     // 01/32/16 changed to remove one by one because on clusters the keys could belong to multiple slots
                     foreach (var key in hashKeys.Where(p => p.HasValue))
                     {
-                        await _connection.Database.KeyDeleteAsync(key.ToString(), CommandFlags.FireAndForget).ConfigureAwait(false);
+                        await _connection.Database.KeyDeleteAsync(key.ToString(), CommandFlags.FireAndForget);
                     }
                 }
 
                 // now delete the region
-                await _connection.Database.KeyDeleteAsync(region).ConfigureAwait(false);
+                await _connection.Database.KeyDeleteAsync(region);
             });
         }
         
@@ -67,7 +67,7 @@ namespace CacheManager.Redis
         public override ValueTask<bool> ExistsAsync(string key)
         {
             var fullKey = GetKey(key);
-            return RetryAsync(async () => await _connection.Database.KeyExistsAsync(fullKey).ConfigureAwait(false));
+            return RetryAsync(async () => await _connection.Database.KeyExistsAsync(fullKey));
         }
 
         /// <inheritdoc />
@@ -76,7 +76,7 @@ namespace CacheManager.Redis
             NotNullOrWhiteSpace(region, nameof(region));
 
             var fullKey = GetKey(key, region);
-            return RetryAsync(async () => await _connection.Database.KeyExistsAsync(fullKey).ConfigureAwait(false));
+            return RetryAsync(async () => await _connection.Database.KeyExistsAsync(fullKey));
         }
         
         /// <summary>
@@ -110,7 +110,7 @@ namespace CacheManager.Redis
         /// <returns>The <c>CacheItem</c>.</returns>
         protected override async ValueTask<CacheItem<TCacheValue>> GetCacheItemInternalAsync(string key, string region)
         {
-            return (await GetCacheItemAndVersionAsync(key, region).ConfigureAwait(false))?.Item1;
+            return (await GetCacheItemAndVersionAsync(key, region))?.Item1;
         }
 
         private async ValueTask<Tuple<CacheItem<TCacheValue>, int>> GetCacheItemAndVersionAsync(string key, string region)
@@ -119,13 +119,13 @@ namespace CacheManager.Redis
             if (!_isLuaAllowed)
             {
                 return Tuple.Create(
-                    await GetCacheItemInternalNoScriptAsync(key, region).ConfigureAwait(false),
+                    await GetCacheItemInternalNoScriptAsync(key, region),
                     version);
             }
 
             var fullKey = GetKey(key, region);
 
-            var result = await RetryAsync(async () => await EvalAsync(ScriptType.Get, fullKey).ConfigureAwait(false)).ConfigureAwait(false);
+            var result = await RetryAsync(async () => await EvalAsync(ScriptType.Get, fullKey));
             if (result == null || result.IsNull)
             {
                 // something went wrong. HMGET should return at least a null result for each requested field
@@ -215,7 +215,7 @@ namespace CacheManager.Redis
                         HashFieldCreated,
                         HashFieldType,
                         HashFieldUsesDefaultExp
-                    }).ConfigureAwait(false);
+                    });
 
                 // the first item stores the value
                 var item = values[0];
@@ -277,7 +277,7 @@ namespace CacheManager.Redis
                 // update sliding
                 if (expirationMode == ExpirationMode.Sliding && expirationTimeout != default(TimeSpan))
                 {
-                    await _connection.Database.KeyExpireAsync(fullKey, cacheItem.ExpirationTimeout, CommandFlags.FireAndForget).ConfigureAwait(false);
+                    await _connection.Database.KeyExpireAsync(fullKey, cacheItem.ExpirationTimeout, CommandFlags.FireAndForget);
                 }
 
                 return cacheItem;
@@ -292,7 +292,7 @@ namespace CacheManager.Redis
         {
             return RetryAsync(async () =>
             {
-                await SetAsync(item, When.Always, false).ConfigureAwait(false);
+                await SetAsync(item, When.Always, false);
             });
         }
 
@@ -322,14 +322,14 @@ namespace CacheManager.Redis
                 // clean up region
                 if (!string.IsNullOrWhiteSpace(region))
                 {
-                    await _connection.Database.HashDeleteAsync(region, fullKey, CommandFlags.FireAndForget).ConfigureAwait(false);
+                    await _connection.Database.HashDeleteAsync(region, fullKey, CommandFlags.FireAndForget);
                 }
 
                 // remove key
-                var result = await _connection.Database.KeyDeleteAsync(fullKey).ConfigureAwait(false);
+                var result = await _connection.Database.KeyDeleteAsync(fullKey);
 
                 return result;
-            }).ConfigureAwait(false);
+            });
         }
         
         private async ValueTask<RedisResult> EvalAsync(ScriptType scriptType, RedisKey redisKey, RedisValue[] values = null, CommandFlags flags = CommandFlags.None)
@@ -359,11 +359,11 @@ namespace CacheManager.Redis
             {
                 if (_canPreloadScripts && script != null)
                 {
-                    return await _connection.Database.ScriptEvaluateAsync(script.Hash, new[] {redisKey}, values, flags).ConfigureAwait(false);
+                    return await _connection.Database.ScriptEvaluateAsync(script.Hash, new[] {redisKey}, values, flags);
                 }
                 else
                 {
-                    return await _connection.Database.ScriptEvaluateAsync(luaScript.ExecutableScript, new[] {redisKey}, values, flags).ConfigureAwait(false);
+                    return await _connection.Database.ScriptEvaluateAsync(luaScript.ExecutableScript, new[] {redisKey}, values, flags);
                 }
             }
             catch (RedisServerException ex) when (ex.Message.StartsWith("NOSCRIPT", StringComparison.OrdinalIgnoreCase))
@@ -380,7 +380,7 @@ namespace CacheManager.Redis
         {
             if (!_isLuaAllowed)
             {
-                return await SetNoScriptAsync(item, when, sync).ConfigureAwait(false);
+                return await SetNoScriptAsync(item, when, sync);
             }
 
             var fullKey = GetKey(item.Key, item.Region);
@@ -404,11 +404,11 @@ namespace CacheManager.Redis
             RedisResult result;
             if (when == When.NotExists)
             {
-                result = await EvalAsync(ScriptType.Add, fullKey, parameters, flags).ConfigureAwait(false);
+                result = await EvalAsync(ScriptType.Add, fullKey, parameters, flags);
             }
             else
             {
-                result = await EvalAsync(ScriptType.Put, fullKey, parameters, flags).ConfigureAwait(false);
+                result = await EvalAsync(ScriptType.Put, fullKey, parameters, flags);
             }
 
             if (result == null)
@@ -418,7 +418,7 @@ namespace CacheManager.Redis
                     if (!string.IsNullOrWhiteSpace(item.Region))
                     {
                         // setting region lookup key if region is being used
-                        await _connection.Database.HashSetAsync(item.Region, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget).ConfigureAwait(false);
+                        await _connection.Database.HashSetAsync(item.Region, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget);
                     }
 
                     // put runs via fire and forget, so we don't get a result back
@@ -450,7 +450,7 @@ namespace CacheManager.Redis
                     {
                         // setting region lookup key if region is being used
                         // we cannot do that within the lua because the region could be on another cluster node!
-                        await _connection.Database.HashSetAsync(item.Region, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget).ConfigureAwait(false);
+                        await _connection.Database.HashSetAsync(item.Region, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget);
                     }
 
                     return true;
@@ -481,7 +481,7 @@ namespace CacheManager.Redis
 
                 var flags = sync ? CommandFlags.None : CommandFlags.FireAndForget;
 
-                var setResult = await _connection.Database.HashSetAsync(fullKey, HashFieldValue, value, when, flags).ConfigureAwait(false);
+                var setResult = await _connection.Database.HashSetAsync(fullKey, HashFieldValue, value, when, flags);
 
                 // setResult from fire and forget is alwys false, so we have to assume it works...
                 setResult = flags == CommandFlags.FireAndForget ? true : setResult;
@@ -491,7 +491,7 @@ namespace CacheManager.Redis
                     if (!string.IsNullOrWhiteSpace(item.Region))
                     {
                         // setting region lookup key if region is being used
-                        await _connection.Database.HashSetAsync(item.Region, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget).ConfigureAwait(false);
+                        await _connection.Database.HashSetAsync(item.Region, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget);
                     }
 
                     // set the additional fields in case sliding expiration should be used in this
@@ -499,17 +499,17 @@ namespace CacheManager.Redis
                     // that we can extend the expiration period every time we do a get
                     if (metaValues != null)
                     {
-                        await _connection.Database.HashSetAsync(fullKey, metaValues, flags).ConfigureAwait(false);
+                        await _connection.Database.HashSetAsync(fullKey, metaValues, flags);
                     }
 
                     if (item.ExpirationMode != ExpirationMode.None && item.ExpirationMode != ExpirationMode.Default)
                     {
-                        await _connection.Database.KeyExpireAsync(fullKey, item.ExpirationTimeout, CommandFlags.FireAndForget).ConfigureAwait(false);
+                        await _connection.Database.KeyExpireAsync(fullKey, item.ExpirationTimeout, CommandFlags.FireAndForget);
                     }
                     else
                     {
                         // bugfix #9
-                        await _connection.Database.KeyPersistAsync(fullKey, CommandFlags.FireAndForget).ConfigureAwait(false);
+                        await _connection.Database.KeyPersistAsync(fullKey, CommandFlags.FireAndForget);
                     }
                 }
 
@@ -564,8 +564,8 @@ namespace CacheManager.Redis
         private async ValueTask RetryAsync(Func<ValueTask> retryme)
             => await RetryAsync(async () =>
             {
-                await retryme().ConfigureAwait(false);
+                await retryme();
                 return true;
-            }).ConfigureAwait(false);
+            });
     }
 }

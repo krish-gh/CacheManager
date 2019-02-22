@@ -338,7 +338,7 @@ namespace CacheManager.Memcached
             }
 
 #if !NET40
-            Task.Delay(adjusted).ConfigureAwait(false).GetAwaiter().GetResult();
+            Task.Delay(adjusted).GetAwaiter().GetResult();
 #else
             Thread.Sleep(adjusted);
 #endif
