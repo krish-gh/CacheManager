@@ -58,7 +58,7 @@ namespace CacheManager.Serialization.Json
         {
             using (var bytesBuilder = new MemoryStream())
             {
-                using (var gzWriter = new GZipStream(bytesBuilder, CompressionLevel.Fastest, true))
+                using (var gzWriter = new GZipStream(bytesBuilder, CompressionLevel.Optimal, true))
                 {
                     gzWriter.Write(data, 0, data.Length);
                     bytesBuilder.Flush();
