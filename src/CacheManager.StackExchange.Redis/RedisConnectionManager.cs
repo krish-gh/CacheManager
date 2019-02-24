@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -12,14 +13,14 @@ namespace CacheManager.Redis
 {
     internal class RedisConnectionManager
     {
-        private static IDictionary<string, IConnectionMultiplexer> _connections = new Dictionary<string, IConnectionMultiplexer>();
-        private static object _connectLock = new object();
+        private static ConcurrentDictionary<string, IConnectionMultiplexer> _connections = new ConcurrentDictionary<string, IConnectionMultiplexer>();
+        private static Func<string, IConnectionMultiplexer> _connectionFactory;
 
         private readonly ILogger _logger;
         private readonly string _connectionString;
         private readonly RedisConfiguration _configuration;
 
-        public RedisConnectionManager(RedisConfiguration configuration, ILoggerFactory loggerFactory)
+        public RedisConnectionManager(RedisConfiguration configuration, ILoggerFactory loggerFactory, Func<string, IConnectionMultiplexer> connectionFactory)
         {
             NotNull(configuration, nameof(configuration));
             NotNull(loggerFactory, nameof(loggerFactory));
@@ -27,6 +28,7 @@ namespace CacheManager.Redis
 
             _configuration = configuration;
             _connectionString = configuration.ConnectionString;
+            _connectionFactory = connectionFactory;
 
             _logger = loggerFactory.CreateLogger(this);
         }
@@ -118,67 +120,52 @@ namespace CacheManager.Redis
 
         public static void AddConnection(string connectionString, IConnectionMultiplexer connection)
         {
-            lock (_connectLock)
-            {
-                if (!_connections.ContainsKey(connectionString))
-                {
-                    _connections.Add(connectionString, connection);
-                }
-            }
+            _connections.TryAdd(connectionString, connection);
         }
 
         public static void RemoveConnection(string connectionString)
         {
-            lock (_connectLock)
-            {
-                if (_connections.ContainsKey(connectionString))
-                {
-                    _connections.Remove(connectionString);
-                }
-            }
+            _connections.TryRemove(connectionString, out var mux);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "nope")]
         public IConnectionMultiplexer Connect()
         {
-            IConnectionMultiplexer connection;
-            if (!_connections.TryGetValue(_connectionString, out connection))
+            var connection = _connectionFactory != null ? _connectionFactory(_connectionString) : null;
+            if (connection == null)
             {
-                lock (_connectLock)
+                connection = _connections.GetOrAdd(_connectionString, c =>
                 {
-                    if (!_connections.TryGetValue(_connectionString, out connection))
+                    if (_logger.IsEnabled(LogLevel.Information))
                     {
-                        if (_logger.IsEnabled(LogLevel.Information))
-                        {
-                            _logger.LogInfo("Trying to connect with the following configuration: '{0}'", RemoveCredentials(_connectionString));
-                        }
-
-                        connection = ConnectionMultiplexer.Connect(_connectionString, new LogWriter(_logger));
-
-                        if (!connection.IsConnected)
-                        {
-                            connection.Dispose();
-                            throw new InvalidOperationException($"Connection to '{RemoveCredentials(_connectionString)}' failed.");
-                        }
-
-                        connection.ConnectionRestored += (sender, args) =>
-                        {
-                            _logger.LogInfo(args.Exception, "Connection restored, type: '{0}', failure: '{1}'", args.ConnectionType, args.FailureType);
-                        };
-
-                        if (!_configuration.TwemproxyEnabled)
-                        {
-                            var endpoints = connection.GetEndPoints();
-                            if (!endpoints.Select(p => connection.GetServer(p))
-                                .Any(p => !p.IsSlave || p.AllowSlaveWrites))
-                            {
-                                throw new InvalidOperationException("No writeable endpoint found.");
-                            }
-                        }
-
-                        _connections.Add(_connectionString, connection);
+                        _logger.LogInfo("Trying to connect with the following configuration: '{0}'", RemoveCredentials(_connectionString));
                     }
-                }
+
+                    var conn = ConnectionMultiplexer.Connect(_connectionString, new LogWriter(_logger));
+
+                    if (!conn.IsConnected)
+                    {
+                        conn.Dispose();
+                        throw new InvalidOperationException($"Connection to '{RemoveCredentials(_connectionString)}' failed.");
+                    }
+
+                    conn.ConnectionRestored += (sender, args) =>
+                    {
+                        _logger.LogInfo(args.Exception, "Connection restored, type: '{0}', failure: '{1}'", args.ConnectionType, args.FailureType);
+                    };
+
+                    if (!_configuration.TwemproxyEnabled)
+                    {
+                        var endpoints = conn.GetEndPoints();
+                        if (!endpoints.Select(p => conn.GetServer(p))
+                            .Any(p => !p.IsSlave || p.AllowSlaveWrites))
+                        {
+                            throw new InvalidOperationException("No writeable endpoint found.");
+                        }
+                    }
+
+                    return conn;
+                });
             }
 
             if (connection == null)

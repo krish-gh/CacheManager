@@ -117,6 +117,40 @@ namespace CacheManager.Redis
             ConnectionString = connectionString;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedisConfiguration"/> class.
+        /// </summary>
+        /// <param name="key">
+        /// The configuration key which will be used by the cache handle to find a configuration for
+        /// the cache handle's name.
+        /// </param>
+        /// <param name="connectionString">
+        /// <param name="connectionFactory">The connection multiplexer factory.</param>
+        /// Instead of specifying all the properties, this can also be done via one connection string.
+        /// </param>
+        /// <param name="database">The redis database to use.</param>
+        /// <param name="keyspaceNotificationsEnabled">Enables keyspace notifications to react on eviction/expiration of items.</param>
+        /// <param name="strictCompatibilityModeVersion">
+        /// Gets or sets a version number to eventually reduce the avaible features accessible by cachemanager.
+        /// </param>
+        public RedisConfiguration(
+            string key,
+            string connectionString,
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+            Func<string, IConnectionMultiplexer> connectionFactory,
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+            int database = 0,
+            bool keyspaceNotificationsEnabled = false,
+            string strictCompatibilityModeVersion = null)
+        {
+            Key = key;
+            Database = database;
+            KeyspaceNotificationsEnabled = keyspaceNotificationsEnabled;
+            StrictCompatibilityModeVersion = strictCompatibilityModeVersion;
+            ConnectionString = connectionString;
+            ConnectionFactory = connectionFactory;
+        }
+
         private ConfigurationOptions CreateConfigurationOptions()
         {
             var configurationOptions = new ConfigurationOptions()
@@ -199,6 +233,13 @@ namespace CacheManager.Redis
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the factory to get multiplexer as per congired bootstrapping
+        /// </summary>
+#pragma warning disable CS3003 // Type is not CLS-compliant
+        public Func<string, IConnectionMultiplexer> ConnectionFactory { get; private set; }
+#pragma warning restore CS3003 // Type is not CLS-compliant
 
         /// <summary>
         /// Gets or sets the password to be used to connect to the Redis server.

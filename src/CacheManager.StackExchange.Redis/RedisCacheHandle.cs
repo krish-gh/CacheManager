@@ -105,7 +105,7 @@ return result";
             _managerConfiguration = managerConfiguration;
             _valueConverter = new RedisValueConverter(serializer);
             _redisConfiguration = RedisConfigurations.GetConfiguration(configuration.Key);
-            _connection = new RedisConnectionManager(_redisConfiguration, loggerFactory);
+            _connection = new RedisConnectionManager(_redisConfiguration, loggerFactory, _redisConfiguration.ConnectionFactory);
             _isLuaAllowed = _connection.Features.Scripting;
 
             // disable preloading right away if twemproxy mode, as this is not supported.

@@ -59,7 +59,8 @@ namespace CacheManager.Redis
             var cfg = RedisConfigurations.GetConfiguration(ConfigurationKey);
             _connection = new RedisConnectionManager(
                 cfg,
-                loggerFactory);
+                loggerFactory,
+                cfg.ConnectionFactory);
 
             RetryHelper.Retry(() => Subscribe(), configuration.RetryTimeout, configuration.MaxRetries, _logger);
 
