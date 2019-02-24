@@ -22,7 +22,7 @@ namespace CacheManager.Core.Internal
         /// <exception cref="ArgumentNullException">
         /// If the <paramref name="key"/> or <paramref name="value"/> is null.
         /// </exception>
-        public virtual ValueTask<bool> AddAsync(string key, TCacheValue value)
+        public virtual Task<bool> AddAsync(string key, TCacheValue value)
         {
             // null checks are done within ctor of the item
             var item = new CacheItem<TCacheValue>(key, value);
@@ -48,7 +48,7 @@ namespace CacheManager.Core.Internal
         /// <exception cref="ArgumentNullException">
         /// If the <paramref name="key"/>, <paramref name="value"/> or <paramref name="region"/> is null.
         /// </exception>
-        public virtual ValueTask<bool> AddAsync(string key, TCacheValue value, string region)
+        public virtual Task<bool> AddAsync(string key, TCacheValue value, string region)
         {
             // null checks are done within ctor of the item
             var item = new CacheItem<TCacheValue>(key, region, value);
@@ -73,7 +73,7 @@ namespace CacheManager.Core.Internal
         /// <exception cref="ArgumentNullException">
         /// If the <paramref name="item"/> or the item's key or value is null.
         /// </exception>
-        public virtual ValueTask<bool> AddAsync(CacheItem<TCacheValue> item)
+        public virtual Task<bool> AddAsync(CacheItem<TCacheValue> item)
         {
             NotNull(item, nameof(item));
 
@@ -83,20 +83,20 @@ namespace CacheManager.Core.Internal
         /// <summary>
         /// Clears this cache, removing all items in the base cache and all regions.
         /// </summary>
-        public abstract ValueTask ClearAsync();
+        public abstract Task ClearAsync();
 
         /// <summary>
         /// Clears the cache region, removing all items from the specified <paramref name="region"/> only.
         /// </summary>
         /// <param name="region">The cache region.</param>
         /// <exception cref="ArgumentNullException">If the <paramref name="region"/> is null.</exception>
-        public abstract ValueTask ClearRegionAsync(string region);
+        public abstract Task ClearRegionAsync(string region);
         
         /// <inheritdoc />
-        public abstract ValueTask<bool> ExistsAsync(string key);
+        public abstract Task<bool> ExistsAsync(string key);
 
         /// <inheritdoc />
-        public abstract ValueTask<bool> ExistsAsync(string key, string region);
+        public abstract Task<bool> ExistsAsync(string key, string region);
         
         /// <summary>
         /// Gets a value for the specified key.
@@ -105,7 +105,7 @@ namespace CacheManager.Core.Internal
         /// <returns>The value being stored in the cache for the given <paramref name="key"/>.</returns>
         /// <exception cref="ArgumentNullException">If the <paramref name="key"/> is null.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Maybe at some point.")]
-        public virtual async ValueTask<TCacheValue> GetAsync(string key)
+        public virtual async Task<TCacheValue> GetAsync(string key)
         {
             var item = await GetCacheItemAsync(key);
 
@@ -129,7 +129,7 @@ namespace CacheManager.Core.Internal
         /// If the <paramref name="key"/> or <paramref name="region"/> is null.
         /// </exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Maybe at some point.")]
-        public virtual async ValueTask<TCacheValue> GetAsync(string key, string region)
+        public virtual async Task<TCacheValue> GetAsync(string key, string region)
         {
             var item = await GetCacheItemAsync(key, region);
 
@@ -152,7 +152,7 @@ namespace CacheManager.Core.Internal
         /// If no explicit cast is defined from <c>TCacheValue</c> to <c>TOut</c>.
         /// </exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Maybe at some point.")]
-        public virtual async ValueTask<TOut> GetAsync<TOut>(string key)
+        public virtual async Task<TOut> GetAsync<TOut>(string key)
         {
             object value = await GetAsync(key);
             return GetCasted<TOut>(value);
@@ -174,7 +174,7 @@ namespace CacheManager.Core.Internal
         /// If no explicit cast is defined from <c>TCacheValue</c> to <c>TOut</c>.
         /// </exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Maybe at some point.")]
-        public virtual async ValueTask<TOut> GetAsync<TOut>(string key, string region)
+        public virtual async Task<TOut> GetAsync<TOut>(string key, string region)
         {
             object value = await GetAsync(key, region);
             return GetCasted<TOut>(value);
@@ -186,7 +186,7 @@ namespace CacheManager.Core.Internal
         /// <param name="key">The key being used to identify the item within the cache.</param>
         /// <returns>The <c>CacheItem</c>.</returns>
         /// <exception cref="ArgumentNullException">If the <paramref name="key"/> is null.</exception>
-        public virtual ValueTask<CacheItem<TCacheValue>> GetCacheItemAsync(string key)
+        public virtual Task<CacheItem<TCacheValue>> GetCacheItemAsync(string key)
         {
             NotNullOrWhiteSpace(key, nameof(key));
 
@@ -202,7 +202,7 @@ namespace CacheManager.Core.Internal
         /// <exception cref="ArgumentNullException">
         /// If the <paramref name="key"/> or <paramref name="region"/> is null.
         /// </exception>
-        public virtual ValueTask<CacheItem<TCacheValue>> GetCacheItemAsync(string key, string region)
+        public virtual Task<CacheItem<TCacheValue>> GetCacheItemAsync(string key, string region)
         {
             NotNullOrWhiteSpace(key, nameof(key));
             NotNullOrWhiteSpace(region, nameof(region));
@@ -215,7 +215,7 @@ namespace CacheManager.Core.Internal
         /// </summary>
         /// <param name="key">The key being used to identify the item within the cache.</param>
         /// <returns>The <c>CacheItem</c>.</returns>
-        protected abstract ValueTask<CacheItem<TCacheValue>> GetCacheItemInternalAsync(string key);
+        protected abstract Task<CacheItem<TCacheValue>> GetCacheItemInternalAsync(string key);
         
         /// <summary>
         /// Gets a <c>CacheItem</c> for the specified key and region.
@@ -223,7 +223,7 @@ namespace CacheManager.Core.Internal
         /// <param name="key">The key being used to identify the item within the cache.</param>
         /// <param name="region">The cache region.</param>
         /// <returns>The <c>CacheItem</c>.</returns>
-        protected abstract ValueTask<CacheItem<TCacheValue>> GetCacheItemInternalAsync(string key, string region);
+        protected abstract Task<CacheItem<TCacheValue>> GetCacheItemInternalAsync(string key, string region);
         
         /// <summary>
         /// Puts the specified <c>CacheItem</c> into the cache.
@@ -240,7 +240,7 @@ namespace CacheManager.Core.Internal
         /// <exception cref="ArgumentNullException">
         /// If the <paramref name="item"/> or the item's key or value is null.
         /// </exception>
-        public virtual ValueTask PutAsync(CacheItem<TCacheValue> item)
+        public virtual Task PutAsync(CacheItem<TCacheValue> item)
         {
             NotNull(item, nameof(item));
 
@@ -251,7 +251,7 @@ namespace CacheManager.Core.Internal
         /// Puts a value into the cache.
         /// </summary>
         /// <param name="item">The <c>CacheItem</c> to be added to the cache.</param>
-        protected internal abstract ValueTask PutInternalAsync(CacheItem<TCacheValue> item);
+        protected internal abstract Task PutInternalAsync(CacheItem<TCacheValue> item);
         
         /// <summary>
         /// Removes a value from the cache for the specified key.
@@ -261,7 +261,7 @@ namespace CacheManager.Core.Internal
         /// <c>true</c> if the key was found and removed from the cache, <c>false</c> otherwise.
         /// </returns>
         /// <exception cref="ArgumentNullException">If the <paramref name="key"/> is null.</exception>
-        public virtual ValueTask<bool> RemoveAsync(string key)
+        public virtual Task<bool> RemoveAsync(string key)
         {
             NotNullOrWhiteSpace(key, nameof(key));
 
@@ -279,7 +279,7 @@ namespace CacheManager.Core.Internal
         /// <exception cref="ArgumentNullException">
         /// If the <paramref name="key"/> or <paramref name="region"/> is null.
         /// </exception>
-        public virtual ValueTask<bool> RemoveAsync(string key, string region)
+        public virtual Task<bool> RemoveAsync(string key, string region)
         {
             NotNullOrWhiteSpace(key, nameof(key));
             NotNullOrWhiteSpace(region, nameof(region));
@@ -295,7 +295,7 @@ namespace CacheManager.Core.Internal
         /// <returns>
         /// <c>true</c> if the key was not already added to the cache, <c>false</c> otherwise.
         /// </returns>
-        protected internal abstract ValueTask<bool> AddInternalAsync(CacheItem<TCacheValue> item);
+        protected internal abstract Task<bool> AddInternalAsync(CacheItem<TCacheValue> item);
         
         /// <summary>
         /// Removes a value from the cache for the specified key.
@@ -304,7 +304,7 @@ namespace CacheManager.Core.Internal
         /// <returns>
         /// <c>true</c> if the key was found and removed from the cache, <c>false</c> otherwise.
         /// </returns>
-        protected abstract ValueTask<bool> RemoveInternalAsync(string key);
+        protected abstract Task<bool> RemoveInternalAsync(string key);
 
         /// <summary>
         /// Removes a value from the cache for the specified key and region.
@@ -314,7 +314,7 @@ namespace CacheManager.Core.Internal
         /// <returns>
         /// <c>true</c> if the key was found and removed from the cache, <c>false</c> otherwise.
         /// </returns>
-        protected abstract ValueTask<bool> RemoveInternalAsync(string key, string region);
+        protected abstract Task<bool> RemoveInternalAsync(string key, string region);
 
     }
 #endif
