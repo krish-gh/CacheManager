@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Caching.Memory;
@@ -27,7 +28,7 @@ namespace CacheManager.MicrosoftCachingMemory
             object temp;
             if (cache.TryGetValue(parentKey, out temp))
             {
-                var set = (HashSet<object>)temp;
+                var set = (ConcurrentBag<object>)temp;
                 set.Add(childKey);
             }
         }
@@ -37,7 +38,7 @@ namespace CacheManager.MicrosoftCachingMemory
             object keys;
             if (cache.TryGetValue(region, out keys))
             {
-                var keySet = (HashSet<object>)keys;
+                var keySet = (ConcurrentBag<object>)keys;
                 foreach (var key in keySet)
                 {
                     cache.Remove(key);
