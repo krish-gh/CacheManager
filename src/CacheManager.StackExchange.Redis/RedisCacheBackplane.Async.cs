@@ -23,8 +23,8 @@ namespace CacheManager.Redis
     /// </remarks>
     public sealed partial class RedisCacheBackplane : CacheBackplane
     {
-        private SemaphoreSlim _messageAsyncLock = new SemaphoreSlim(0, 1);
-        private SemaphoreSlim _messageSendAsyncLock = new SemaphoreSlim(0, 1);
+        private SemaphoreSlim _messageAsyncLock = new SemaphoreSlim(1, 1);
+        private SemaphoreSlim _messageSendAsyncLock = new SemaphoreSlim(1, 1);
 
         /// <summary>
         /// Notifies other cache clients about a changed cache key.
@@ -90,7 +90,7 @@ namespace CacheManager.Redis
 
         private async Task PublishMessageAsync(BackplaneMessage message)
         {
-            await _messageAsyncLock.WaitAsync();
+            await _messageAsyncLock.WaitAsync(TimeSpan.FromSeconds(10));
             try
             {
                 if (message.Action == BackplaneAction.Clear)
@@ -146,7 +146,7 @@ namespace CacheManager.Redis
             await Task.Delay(10);
 #endif
             byte[] msgs = null;
-            await _messageSendAsyncLock.WaitAsync();
+            await _messageSendAsyncLock.WaitAsync(TimeSpan.FromSeconds(10));
             try
             {
                 if (_messages != null && _messages.Count > 0)
