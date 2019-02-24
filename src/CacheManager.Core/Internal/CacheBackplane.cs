@@ -16,7 +16,7 @@ namespace CacheManager.Core.Internal
     /// The same mechanism will apply to any Update, Put, Remove, Clear or ClearRegion call of the cache.
     /// </para>
     /// </summary>
-    public abstract class CacheBackplane : IDisposable
+    public abstract partial class CacheBackplane : IDisposable
     {
         /// <summary>
         /// Number of messages sent.

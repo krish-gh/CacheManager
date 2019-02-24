@@ -25,7 +25,7 @@ namespace CacheManager.Redis
     /// The cache manager must have at least one cache handle configured with <see cref="CacheHandleConfiguration.IsBackplaneSource"/> set to <c>true</c>.
     /// Usually this is the redis cache handle, if configured. It should be the distributed and bottom most cache handle.
     /// </remarks>
-    public sealed class RedisCacheBackplane : CacheBackplane
+    public sealed partial class RedisCacheBackplane : CacheBackplane
     {
         private const int HardLimit = 50000;
         private readonly string _channelName;
@@ -35,6 +35,7 @@ namespace CacheManager.Redis
         private readonly Timer _timer;
         private HashSet<BackplaneMessage> _messages = new HashSet<BackplaneMessage>();
         private object _messageLock = new object();
+        private object _messageSendLock = new object();
         private int _skippedMessages = 0;
         private bool _sending = false;
         private CancellationTokenSource _source = new CancellationTokenSource();
@@ -210,7 +211,7 @@ namespace CacheManager.Redis
                     await Task.Delay(10);
 #endif
                     byte[] msgs = null;
-                    lock (_messageLock)
+                    lock (_messageSendLock)
                     {
                         if (_messages != null && _messages.Count > 0)
                         {
