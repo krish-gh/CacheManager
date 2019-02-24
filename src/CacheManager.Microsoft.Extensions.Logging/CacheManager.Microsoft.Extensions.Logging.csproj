@@ -8,9 +8,10 @@
     <PackageTags>Caching;Cache;CacheManager;Distributed Cache;Logging</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CacheManager.Core\CacheManager.Core.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CacheManager.Core\CacheManager.Core.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
