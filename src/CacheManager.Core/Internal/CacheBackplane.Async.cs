@@ -44,7 +44,7 @@ namespace CacheManager.Core.Internal
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="action">The action.</param>
-        public abstract Task NotifyChangeAsync(string key, CacheItemChangedEventAction action);
+        public abstract ValueTask NotifyChangeAsync(string key, CacheItemChangedEventAction action);
 
         /// <summary>
         /// Notifies other cache clients about a changed cache key.
@@ -52,31 +52,31 @@ namespace CacheManager.Core.Internal
         /// <param name="key">The key.</param>
         /// <param name="region">The region.</param>
         /// <param name="action">The action.</param>
-        public abstract Task NotifyChangeAsync(string key, string region, CacheItemChangedEventAction action);
+        public abstract ValueTask NotifyChangeAsync(string key, string region, CacheItemChangedEventAction action);
 
         /// <summary>
         /// Notifies other cache clients about a cache clear.
         /// </summary>
-        public abstract Task NotifyClearAsync();
+        public abstract ValueTask NotifyClearAsync();
 
         /// <summary>
         /// Notifies other cache clients about a cache clear region call.
         /// </summary>
         /// <param name="region">The region.</param>
-        public abstract Task NotifyClearRegionAsync(string region);
+        public abstract ValueTask NotifyClearRegionAsync(string region);
 
         /// <summary>
         /// Notifies other cache clients about a removed cache key.
         /// </summary>
         /// <param name="key">The key.</param>
-        public abstract Task NotifyRemoveAsync(string key);
+        public abstract ValueTask NotifyRemoveAsync(string key);
 
         /// <summary>
         /// Notifies other cache clients about a removed cache key.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="region">The region.</param>
-        public abstract Task NotifyRemoveAsync(string key, string region);
+        public abstract ValueTask NotifyRemoveAsync(string key, string region);
 
         /// <summary>
         /// Sends a changed message for the given <paramref name="key"/>.

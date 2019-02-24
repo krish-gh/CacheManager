@@ -31,7 +31,7 @@ namespace CacheManager.Redis
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="action">The cache action.</param>
-        public override Task NotifyChangeAsync(string key, CacheItemChangedEventAction action)
+        public override ValueTask NotifyChangeAsync(string key, CacheItemChangedEventAction action)
         {
             return PublishMessageAsync(BackplaneMessage.ForChanged(_identifier, key, action));
         }
@@ -42,7 +42,7 @@ namespace CacheManager.Redis
         /// <param name="key">The key.</param>
         /// <param name="region">The region.</param>
         /// <param name="action">The cache action.</param>
-        public override Task NotifyChangeAsync(string key, string region, CacheItemChangedEventAction action)
+        public override ValueTask NotifyChangeAsync(string key, string region, CacheItemChangedEventAction action)
         {
             return PublishMessageAsync(BackplaneMessage.ForChanged(_identifier, key, region, action));
         }
@@ -50,7 +50,7 @@ namespace CacheManager.Redis
         /// <summary>
         /// Notifies other cache clients about a cache clear.
         /// </summary>
-        public override Task NotifyClearAsync()
+        public override ValueTask NotifyClearAsync()
         {
             return PublishMessageAsync(BackplaneMessage.ForClear(_identifier));
         }
@@ -59,7 +59,7 @@ namespace CacheManager.Redis
         /// Notifies other cache clients about a cache clear region call.
         /// </summary>
         /// <param name="region">The region.</param>
-        public override Task NotifyClearRegionAsync(string region)
+        public override ValueTask NotifyClearRegionAsync(string region)
         {
             return PublishMessageAsync(BackplaneMessage.ForClearRegion(_identifier, region));
         }
@@ -68,7 +68,7 @@ namespace CacheManager.Redis
         /// Notifies other cache clients about a removed cache key.
         /// </summary>
         /// <param name="key">The key.</param>
-        public override Task NotifyRemoveAsync(string key)
+        public override ValueTask NotifyRemoveAsync(string key)
         {
             return PublishMessageAsync(BackplaneMessage.ForRemoved(_identifier, key));
         }
@@ -78,17 +78,17 @@ namespace CacheManager.Redis
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="region">The region.</param>
-        public override Task NotifyRemoveAsync(string key, string region)
+        public override ValueTask NotifyRemoveAsync(string key, string region)
         {
             return PublishMessageAsync(BackplaneMessage.ForRemoved(_identifier, key, region));
         }
 
-        private Task PublishAsync(byte[] message)
+        private async ValueTask PublishAsync(byte[] message)
         {
-            return _connection.Subscriber.PublishAsync(_channelName, message);
+            await _connection.Subscriber.PublishAsync(_channelName, message);
         }
 
-        private async Task PublishMessageAsync(BackplaneMessage message)
+        private async ValueTask PublishMessageAsync(BackplaneMessage message)
         {
             await _messageAsyncLock.WaitAsync();
             try
@@ -125,7 +125,7 @@ namespace CacheManager.Redis
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "No other way")]
-        private async Task SendMessagesAsync(object state)
+        private async ValueTask SendMessagesAsync(object state)
         {
             if (_sending || _messages == null || _messages.Count == 0)
             {

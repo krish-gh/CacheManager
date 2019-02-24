@@ -39,11 +39,11 @@ namespace CacheManager.Core
                 {
                     if (string.IsNullOrWhiteSpace(item.Region))
                     {
-                        _cacheBackplane.NotifyChange(item.Key, CacheItemChangedEventAction.Add);
+                        await _cacheBackplane.NotifyChangeAsync(item.Key, CacheItemChangedEventAction.Add);
                     }
                     else
                     {
-                        _cacheBackplane.NotifyChange(item.Key, item.Region, CacheItemChangedEventAction.Add);
+                        await _cacheBackplane.NotifyChangeAsync(item.Key, item.Region, CacheItemChangedEventAction.Add);
                     }
 
                     if (_logTrace)
@@ -86,7 +86,7 @@ namespace CacheManager.Core
                     Logger.LogTrace("Clear: notifies backplane.");
                 }
 
-                _cacheBackplane.NotifyClear();
+                await _cacheBackplane.NotifyClearAsync();
             }
 
             TriggerOnClear();
@@ -121,7 +121,7 @@ namespace CacheManager.Core
                     Logger.LogTrace("Clear region: {0}: notifies backplane [clear region].", region);
                 }
 
-                _cacheBackplane.NotifyClearRegion(region);
+                await _cacheBackplane.NotifyClearRegionAsync(region);
             }
 
             TriggerOnClearRegion(region);
@@ -272,11 +272,11 @@ namespace CacheManager.Core
 
                 if (string.IsNullOrWhiteSpace(item.Region))
                 {
-                    _cacheBackplane.NotifyChange(item.Key, CacheItemChangedEventAction.Put);
+                    await _cacheBackplane.NotifyChangeAsync(item.Key, CacheItemChangedEventAction.Put);
                 }
                 else
                 {
-                    _cacheBackplane.NotifyChange(item.Key, item.Region, CacheItemChangedEventAction.Put);
+                    await _cacheBackplane.NotifyChangeAsync(item.Key, item.Region, CacheItemChangedEventAction.Put);
                 }
             }
 
@@ -339,11 +339,11 @@ namespace CacheManager.Core
 
                     if (string.IsNullOrWhiteSpace(region))
                     {
-                        _cacheBackplane.NotifyRemove(key);
+                        await _cacheBackplane.NotifyRemoveAsync(key);
                     }
                     else
                     {
-                        _cacheBackplane.NotifyRemove(key, region);
+                        await _cacheBackplane.NotifyRemoveAsync(key, region);
                     }
                 }
 
