@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\tools\common.props" />
   <PropertyGroup>
-    <Description>CacheManager extension package to use Microsoft.Extensions.Configuration to configure the CacheManager instance. CacheManager is an open source caching abstraction layer for .NET written in C#. This is the ASP.NET Core configuration integration package.</Description>
+    <Description>[This is a fork of original work https://github.com/MichaCo/CacheManager to add async support plus redis connection multiplexer factory]
+CacheManager extension package to use Microsoft.Extensions.Configuration to configure the CacheManager instance. CacheManager is an open source caching abstraction layer for .NET written in C#. This is the ASP.NET Core configuration integration package.</Description>
     <TargetFrameworks>netstandard2.0;net461;</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTags>Caching;Cache;CacheManager;Distributed Cache;Configuration</PackageTags>
+    <PackageId>CacheManager.Microsoft.Extensions.Configuration.Async</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\CacheManager.Core\CacheManager.Core.csproj" />

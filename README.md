@@ -1,3 +1,5 @@
+[This is a fork of original work https://github.com/MichaCo/CacheManager to add async support plus redis connection multiplexer factory]
+
 CacheManager is an open source caching abstraction layer for .NET written in C#. It supports various cache providers and implements many advanced features.
 
 The main goal of the CacheManager package is to make developer's life easier to handle even very complex caching scenarios.  

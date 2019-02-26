@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\tools\common.props" />
   <PropertyGroup>
-    <Description>CacheManager extension package to work with Microsoft.Extensions.Logging as logging provider. CacheManager is an open source caching abstraction layer for .NET written in C#. The ASP.NET Core logging provides a bridge to the Microsoft.Extensions.Logging framework.</Description>
+    <Description>[This is a fork of original work https://github.com/MichaCo/CacheManager to add async support plus redis connection multiplexer factory]
+CacheManager extension package to work with Microsoft.Extensions.Logging as logging provider. CacheManager is an open source caching abstraction layer for .NET written in C#. The ASP.NET Core logging provides a bridge to the Microsoft.Extensions.Logging framework.</Description>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTags>Caching;Cache;CacheManager;Distributed Cache;Logging</PackageTags>
+    <PackageId>CacheManager.Microsoft.Extensions.Logging.Async</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
