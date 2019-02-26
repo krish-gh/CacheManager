@@ -2,15 +2,15 @@
   <Import Project="version.props" />
 
   <PropertyGroup>
-    <Copyright>Copyright (c) 2017 MichaConrad</Copyright>
-    <Authors>MichaConrad</Authors>
+    <Copyright>Copyright (c) 2018 Krish-Gh</Copyright>
+    <Authors>MichaConrad;krish-gh</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <PackageIconUrl>http://cachemanager.michaco.net/favicon-128.png</PackageIconUrl>
-    <PackageProjectUrl>http://cachemanager.michaco.net</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/MichaCo/CacheManager/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/krish-gh/CacheManager</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/krish-gh/CacheManager/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/MichaCo/CacheManager</RepositoryUrl>
+    <RepositoryUrl>https://github.com/krish-gh/CacheManager</RepositoryUrl>
 
     <Product>CacheManager.NET</Product>
 
