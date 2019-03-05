@@ -16,13 +16,13 @@ namespace CacheManager.Serialization.MessagePack
         /// <inheritdoc/>
         public override object Deserialize(byte[] data, Type target)
         {
-            return LZ4MessagePackSerializer.NonGeneric.Deserialize(target, data, ContractlessStandardResolver.Instance);
+            return LZ4MessagePackSerializer.NonGeneric.Deserialize(target, data, ContractlessStandardResolverAllowPrivate.Instance);
         }
 
         /// <inheritdoc/>
         public override byte[] Serialize<T>(T value)
         {
-            return LZ4MessagePackSerializer.Serialize(value, ContractlessStandardResolver.Instance);
+            return LZ4MessagePackSerializer.Serialize(value, ContractlessStandardResolverAllowPrivate.Instance);
         }
 
         /// <inheritdoc/>
