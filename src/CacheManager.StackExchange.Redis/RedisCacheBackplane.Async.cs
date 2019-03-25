@@ -85,12 +85,12 @@ namespace CacheManager.Redis
 
         private async Task PublishAsync(byte[] message)
         {
-            await _connection.Subscriber.PublishAsync(_channelName, message);
+            await _connection.Subscriber.PublishAsync(_channelName, message).ConfigureAwait(false);
         }
 
         private async Task PublishMessageAsync(BackplaneMessage message)
         {
-            await _messageAsyncLock.WaitAsync(TimeSpan.FromSeconds(10));
+            await _messageAsyncLock.WaitAsync(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
             try
             {
                 if (message.Action == BackplaneAction.Clear)
@@ -116,7 +116,7 @@ namespace CacheManager.Redis
                     }
                 }
 
-                await SendMessagesAsync(null);
+                await SendMessagesAsync(null).ConfigureAwait(false);
             }
             finally
             {
@@ -143,10 +143,10 @@ namespace CacheManager.Redis
                 _logger.LogInfo($"Backplane is sending {_messages.Count} messages triggered by timer.");
             }
 #if !NET40
-            await Task.Delay(10);
+            await Task.Delay(10).ConfigureAwait(false);
 #endif
             byte[] msgs = null;
-            await _messageSendAsyncLock.WaitAsync(TimeSpan.FromSeconds(10));
+            await _messageSendAsyncLock.WaitAsync(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
             try
             {
                 if (_messages != null && _messages.Count > 0)
@@ -162,7 +162,7 @@ namespace CacheManager.Redis
                     {
                         if (msgs != null)
                         {
-                            await PublishAsync(msgs);
+                            await PublishAsync(msgs).ConfigureAwait(false);
                             Interlocked.Increment(ref SentChunks);
                             Interlocked.Add(ref MessagesSent, _messages.Count);
                             _skippedMessages = 0;

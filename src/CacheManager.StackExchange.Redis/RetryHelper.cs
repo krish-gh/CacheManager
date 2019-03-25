@@ -133,7 +133,7 @@ namespace CacheManager.Redis
 
                 try
                 {
-                    return await retryme();
+                    return await retryme().ConfigureAwait(false);
                 }
 
                 // might occur on lua script execution on a readonly slave because the master just died.
@@ -151,7 +151,7 @@ namespace CacheManager.Redis
                     }
 
                     logger.LogWarn(ex, WarningMessage, tries, retries);
-                    await Task.Delay(timeOut);
+                    await Task.Delay(timeOut).ConfigureAwait(false);
                 }
                 catch (RedisConnectionException ex)
                 {
@@ -162,7 +162,7 @@ namespace CacheManager.Redis
                     }
 
                     logger.LogWarn(ex, WarningMessage, tries, retries);
-                    await Task.Delay(timeOut);
+                    await Task.Delay(timeOut).ConfigureAwait(false);
                 }
                 catch (TimeoutException ex)
                 {
@@ -173,7 +173,7 @@ namespace CacheManager.Redis
                     }
 
                     logger.LogWarn(ex, WarningMessage, tries, retries);
-                    await Task.Delay(timeOut);
+                    await Task.Delay(timeOut).ConfigureAwait(false);
                 }
                 catch (AggregateException aggregateException)
                 {
@@ -195,7 +195,7 @@ namespace CacheManager.Redis
                         if (e is RedisConnectionException || e is System.TimeoutException || e is RedisServerException)
                         {
                             logger.LogWarn(e, WarningMessage, tries, retries);
-                            await Task.Delay(timeOut);
+                            await Task.Delay(timeOut).ConfigureAwait(false);
                             continue;
                         }
 
@@ -219,12 +219,12 @@ namespace CacheManager.Redis
             await RetryAsync(
                 async () =>
                 {
-                    await retryme();
+                    await retryme().ConfigureAwait(false);
                     return true;
                 },
                 timeOut,
                 retries,
-                logger);
+                logger).ConfigureAwait(false);
         }
     }
 }

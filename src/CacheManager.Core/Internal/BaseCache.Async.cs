@@ -107,7 +107,7 @@ namespace CacheManager.Core.Internal
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Maybe at some point.")]
         public virtual async Task<TCacheValue> GetAsync(string key)
         {
-            var item = await GetCacheItemAsync(key);
+            var item = await GetCacheItemAsync(key).ConfigureAwait(false);
 
             if (item != null && item.Key.Equals(key))
             {
@@ -131,7 +131,7 @@ namespace CacheManager.Core.Internal
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Maybe at some point.")]
         public virtual async Task<TCacheValue> GetAsync(string key, string region)
         {
-            var item = await GetCacheItemAsync(key, region);
+            var item = await GetCacheItemAsync(key, region).ConfigureAwait(false);
 
             if (item != null && item.Key.Equals(key) && item.Region != null && item.Region.Equals(region))
             {
@@ -154,7 +154,7 @@ namespace CacheManager.Core.Internal
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Maybe at some point.")]
         public virtual async Task<TOut> GetAsync<TOut>(string key)
         {
-            object value = await GetAsync(key);
+            object value = await GetAsync(key).ConfigureAwait(false);
             return GetCasted<TOut>(value);
         }
 
@@ -176,7 +176,7 @@ namespace CacheManager.Core.Internal
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Maybe at some point.")]
         public virtual async Task<TOut> GetAsync<TOut>(string key, string region)
         {
-            object value = await GetAsync(key, region);
+            object value = await GetAsync(key, region).ConfigureAwait(false);
             return GetCasted<TOut>(value);
         }
         

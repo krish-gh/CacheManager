@@ -26,11 +26,11 @@ namespace CacheManager.Core
 
             var handleIndex = _cacheHandles.Length - 1;
 
-            var result = await AddItemToHandleAsync(item, _cacheHandles[handleIndex]);
+            var result = await AddItemToHandleAsync(item, _cacheHandles[handleIndex]).ConfigureAwait(false);
 
             // evict from other handles in any case because if it exists, it might be a different version
             // if not exist, its just a sanity check to invalidate other versions in upper layers.
-            await EvictFromOtherHandlesAsync(item.Key, item.Region, handleIndex);
+            await EvictFromOtherHandlesAsync(item.Key, item.Region, handleIndex).ConfigureAwait(false);
 
             if (result)
             {
@@ -39,11 +39,11 @@ namespace CacheManager.Core
                 {
                     if (string.IsNullOrWhiteSpace(item.Region))
                     {
-                        await _cacheBackplane.NotifyChangeAsync(item.Key, CacheItemChangedEventAction.Add);
+                        await _cacheBackplane.NotifyChangeAsync(item.Key, CacheItemChangedEventAction.Add).ConfigureAwait(false);
                     }
                     else
                     {
-                        await _cacheBackplane.NotifyChangeAsync(item.Key, item.Region, CacheItemChangedEventAction.Add);
+                        await _cacheBackplane.NotifyChangeAsync(item.Key, item.Region, CacheItemChangedEventAction.Add).ConfigureAwait(false);
                     }
 
                     if (_logTrace)
@@ -75,7 +75,7 @@ namespace CacheManager.Core
                     Logger.LogTrace("Clear: clearing handle {0}.", handle.Configuration.Name);
                 }
 
-                await handle.ClearAsync();
+                await handle.ClearAsync().ConfigureAwait(false);
                 handle.Stats.OnClear();
             }
 
@@ -86,7 +86,7 @@ namespace CacheManager.Core
                     Logger.LogTrace("Clear: notifies backplane.");
                 }
 
-                await _cacheBackplane.NotifyClearAsync();
+                await _cacheBackplane.NotifyClearAsync().ConfigureAwait(false);
             }
 
             TriggerOnClear();
@@ -110,7 +110,7 @@ namespace CacheManager.Core
                     Logger.LogTrace("Clear region: {0} in handle {1}.", region, handle.Configuration.Name);
                 }
 
-                await handle.ClearRegionAsync(region);
+                await handle.ClearRegionAsync(region).ConfigureAwait(false);
                 handle.Stats.OnClearRegion(region);
             }
 
@@ -121,7 +121,7 @@ namespace CacheManager.Core
                     Logger.LogTrace("Clear region: {0}: notifies backplane [clear region].", region);
                 }
 
-                await _cacheBackplane.NotifyClearRegionAsync(region);
+                await _cacheBackplane.NotifyClearRegionAsync(region).ConfigureAwait(false);
             }
 
             TriggerOnClearRegion(region);
@@ -137,7 +137,7 @@ namespace CacheManager.Core
                     Logger.LogTrace("Checking if [{0}] exists on handle '{1}'.", key, handle.Configuration.Name);
                 }
 
-                if (await handle.ExistsAsync(key))
+                if (await handle.ExistsAsync(key).ConfigureAwait(false))
                 {
                     return true;
                 }
@@ -156,7 +156,7 @@ namespace CacheManager.Core
                     Logger.LogTrace("Checking if [{0}:{1}] exists on handle '{2}'.", region, key, handle.Configuration.Name);
                 }
 
-                if (await handle.ExistsAsync(key, region))
+                if (await handle.ExistsAsync(key, region).ConfigureAwait(false))
                 {
                     return true;
                 }
@@ -190,7 +190,7 @@ namespace CacheManager.Core
                 }
                 else
                 {
-                    cacheItem = await handle.GetCacheItemAsync(key, region);
+                    cacheItem = await handle.GetCacheItemAsync(key, region).ConfigureAwait(false);
                 }
 
                 handle.Stats.OnGet(region);
@@ -244,8 +244,8 @@ namespace CacheManager.Core
                     // count it every time, but use only the current handle to retrieve the item,
                     // otherwise we would trigger gets and find it in another handle maybe
                     var oldItem = string.IsNullOrWhiteSpace(item.Region) ?
-                        await handle.GetCacheItemAsync(item.Key) :
-                        await handle.GetCacheItemAsync(item.Key, item.Region);
+                        await handle.GetCacheItemAsync(item.Key).ConfigureAwait(false) :
+                        await handle.GetCacheItemAsync(item.Key, item.Region).ConfigureAwait(false);
 
                     handle.Stats.OnPut(item, oldItem == null);
                 }
@@ -259,7 +259,7 @@ namespace CacheManager.Core
                         handle.Configuration.Name);
                 }
 
-                await handle.PutAsync(item);
+                await handle.PutAsync(item).ConfigureAwait(false);
             }
 
             // update backplane
@@ -272,11 +272,11 @@ namespace CacheManager.Core
 
                 if (string.IsNullOrWhiteSpace(item.Region))
                 {
-                    await _cacheBackplane.NotifyChangeAsync(item.Key, CacheItemChangedEventAction.Put);
+                    await _cacheBackplane.NotifyChangeAsync(item.Key, CacheItemChangedEventAction.Put).ConfigureAwait(false);
                 }
                 else
                 {
-                    await _cacheBackplane.NotifyChangeAsync(item.Key, item.Region, CacheItemChangedEventAction.Put);
+                    await _cacheBackplane.NotifyChangeAsync(item.Key, item.Region, CacheItemChangedEventAction.Put).ConfigureAwait(false);
                 }
             }
 
@@ -304,11 +304,11 @@ namespace CacheManager.Core
                 var handleResult = false;
                 if (!string.IsNullOrWhiteSpace(region))
                 {
-                    handleResult = await handle.RemoveAsync(key, region);
+                    handleResult = await handle.RemoveAsync(key, region).ConfigureAwait(false);
                 }
                 else
                 {
-                    handleResult = await handle.RemoveAsync(key);
+                    handleResult = await handle.RemoveAsync(key).ConfigureAwait(false);
                 }
 
                 if (handleResult)
@@ -339,11 +339,11 @@ namespace CacheManager.Core
 
                     if (string.IsNullOrWhiteSpace(region))
                     {
-                        await _cacheBackplane.NotifyRemoveAsync(key);
+                        await _cacheBackplane.NotifyRemoveAsync(key).ConfigureAwait(false);
                     }
                     else
                     {
-                        await _cacheBackplane.NotifyRemoveAsync(key, region);
+                        await _cacheBackplane.NotifyRemoveAsync(key, region).ConfigureAwait(false);
                     }
                 }
 
@@ -371,7 +371,7 @@ namespace CacheManager.Core
             {
                 if (handleIndex != excludeIndex)
                 {
-                    await EvictFromHandleAsync(key, region, _cacheHandles[handleIndex]);
+                    await EvictFromHandleAsync(key, region, _cacheHandles[handleIndex]).ConfigureAwait(false);
                 }
             }
         }
@@ -390,11 +390,11 @@ namespace CacheManager.Core
             bool result;
             if (string.IsNullOrWhiteSpace(region))
             {
-                result = await handle.RemoveAsync(key);
+                result = await handle.RemoveAsync(key).ConfigureAwait(false);
             }
             else
             {
-                result = await handle.RemoveAsync(key, region);
+                result = await handle.RemoveAsync(key, region).ConfigureAwait(false);
             }
 
             if (result)
@@ -405,7 +405,7 @@ namespace CacheManager.Core
         
         private static async Task<bool> AddItemToHandleAsync(CacheItem<TCacheValue> item, BaseCacheHandle<TCacheValue> handle)
         {
-            if (await handle.AddAsync(item))
+            if (await handle.AddAsync(item).ConfigureAwait(false))
             {
                 handle.Stats.OnAdd(item);
                 return true;
