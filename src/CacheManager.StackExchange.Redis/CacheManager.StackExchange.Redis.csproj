@@ -10,7 +10,7 @@ CacheManager extension package which adds support for Redis as a distributed cac
     <PackageId>CacheManager.StackExchange.Redis.Async</PackageId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="StackExchange.Redis" Version="2.0.519" />
+    <PackageReference Include="StackExchange.Redis" Version="2.0.571" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CacheManager.Core\CacheManager.Core.csproj" />
